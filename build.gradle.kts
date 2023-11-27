@@ -37,6 +37,7 @@ dependencies {
   testImplementation("io.kotest:kotest-property:${property("kotestVersion")}")
   testImplementation("io.kotest:kotest-extensions-spring-jvm:${property("kotestVersion")}")
   testImplementation("io.mockk:mockk:${property("mockKVersion")}")
+  testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter-kotlin:1.0.1")
 
 }
 

@@ -2,11 +2,20 @@ package com.example.sampleapi.service.user
 
 import com.example.sampleapi.domain.user.User
 import com.example.sampleapi.domain.user.UserRepository
-import io.kotest.assertions.throwables.shouldThrow
+import com.navercorp.fixturemonkey.FixtureMonkey
+import com.navercorp.fixturemonkey.kotlin.KotlinPlugin
+import com.navercorp.fixturemonkey.kotlin.giveMeBuilder
+import com.navercorp.fixturemonkey.kotlin.minSizeExp
+import com.navercorp.fixturemonkey.kotlin.setExp
+import io.kotest.core.spec.style.AnnotationSpec
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.core.spec.style.Test
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import org.junit.jupiter.api.RepeatedTest
+import java.time.Instant
+
 
 //class SignOnAnnotationTest : AnnotationSpec() {
 //  val userService = UserServiceImpl()
@@ -43,16 +52,17 @@ class SignOnTest() : BehaviorSpec({
     passwordCasies = settingPasswordCase()
   }
 
+  every { userRepository.findByUserId("test") } returns User("test", "test123")
+  every { userRepository.findByUserId("lian") } returns null
+
   given("회원가입 정보 받았을때") {
     `when`("이미 존재하지 않는 id 일때") {
-      every { userRepository.findByUserId("test") } returns User("test", "test123")
       then("이미 회원가입이 되어 있습니다.") {
         userService.isDuplicatedUserId("test") shouldBe false
       }
     }
 
     `when`("존재하지 않는 id 일때") {
-      every { userRepository.findByUserId("lian") } returns null
       then("이미 회원가입이 되어 있습니다.") {
         userService.isDuplicatedUserId("lian") shouldBe true
       }
@@ -98,18 +108,18 @@ class SignOnTest() : BehaviorSpec({
     every { userRepository.findByUserId("test") } returns User("test", "test123")
     every { userRepository.save(lianUser) } returns lianUser
 
-    `when`("회원가입 정보를 올바르게 입력 했을때") {
+    `when`("올바른 회원가입 정보를 입력 했을때") {
 
-      and("id중복 검사") {
+      and("id가 중복 되지 않았을 때") {
         userService.isDuplicatedUserId(lianUser.userId) shouldBe true
-      }
 
-      and("pw 검증") {
-        userService.validatePassword(lianUser.userPassword) shouldBe true
-      }
+        and("pw 검증 통과 할 때") {
+          userService.validatePassword(lianUser.userPassword) shouldBe true
 
-      then("회원 가입 성공.") {
-        userService.createUser(lianUser) shouldBe lianUser
+          then("회원 가입 성공.") {
+            userService.createUser(lianUser) shouldBe lianUser
+          }
+        }
       }
     }
   }
@@ -122,4 +132,54 @@ fun settingPasswordCase(): List<SignOnCase> {
       SignOnCase("test", "12312311", false),
       SignOnCase("lian", "test123A!", true),
   )
+}
+
+val fixtureMonkey = FixtureMonkey.builder().plugin(KotlinPlugin())
+  .build()
+
+class SignOnAnnotationTest : AnnotationSpec() {
+  @Test
+  @RepeatedTest(100)
+  fun customize() {
+    var sample: Sample = fixtureMonkey.giveMeOne(Sample::class.java)
+    sample.orderNo shouldBe null
+  }
+
+
+  data class Order (
+    val id: Long,
+
+    val orderNo: String,
+
+    val productName: String,
+
+    val quantity: Int,
+
+    val price: Long,
+
+    val items: List<String>,
+
+    val orderedAt: Instant
+  )
+
+  @Test
+  fun sampleOrder() {
+    // given
+    val sut = FixtureMonkey.builder()
+      .plugin(KotlinPlugin())
+      .build()
+
+    // when
+    val actual = sut.giveMeBuilder<Order>()
+      .setExp(Order::orderNo, "1")
+      .setExp(Order::productName, "Line Sally")
+      .minSizeExp(Order::items, 1)
+      .sample()
+
+    // then
+    actual.orderNo shouldBe "1"
+    actual.productName shouldBe "Line Sally"
+    actual.items?.let { actual.items.size } shouldBe 1
+  }
+
 }

@@ -35,8 +35,8 @@ class UserServiceImpl @Autowired constructor(
 
   private fun isCheckAlphabetUpperCase(password: String): Boolean {
     var isAlphaUpperCase = false
-    password.chars().forEach({
-      if (it >= 65 && it <= 91) {
+    password.toMutableList().forEach({
+      if (it >= 'A' && it <= 'Z') {
         isAlphaUpperCase = true
       }
     })
