@@ -142,7 +142,7 @@ class SignOnAnnotationTest : AnnotationSpec() {
   @RepeatedTest(100)
   fun customize() {
     var sample: Sample = fixtureMonkey.giveMeOne(Sample::class.java)
-    sample.orderNo shouldBe null
+    sample.productName shouldBe null
   }
 
 
@@ -163,6 +163,7 @@ class SignOnAnnotationTest : AnnotationSpec() {
   )
 
   @Test
+  @RepeatedTest(10)
   fun sampleOrder() {
     // given
     val sut = FixtureMonkey.builder()

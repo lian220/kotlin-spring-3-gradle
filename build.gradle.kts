@@ -28,7 +28,10 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-jdbc")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.jetbrains.kotlin:kotlin-reflect")
+  implementation("org.bgee.log4jdbc-log4j2", "log4jdbc-log4j2-jdbc4.1", "1.16")
 
+  implementation("org.springframework.boot:spring-boot-starter-data-redis")
+  implementation ("org.redisson:redisson-spring-boot-starter:3.23.2")
   runtimeOnly("com.mysql:mysql-connector-j")
 
   testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -37,7 +40,7 @@ dependencies {
   testImplementation("io.kotest:kotest-property:${property("kotestVersion")}")
   testImplementation("io.kotest:kotest-extensions-spring-jvm:${property("kotestVersion")}")
   testImplementation("io.mockk:mockk:${property("mockKVersion")}")
-  testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter-kotlin:1.0.1")
+  testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter-kotlin:1.0.3")
 
 }
 

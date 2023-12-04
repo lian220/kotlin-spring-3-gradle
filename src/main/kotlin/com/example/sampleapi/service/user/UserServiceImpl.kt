@@ -8,29 +8,25 @@ import org.springframework.stereotype.Service
 
 @Service
 class UserServiceImpl @Autowired constructor(
-    private val userRepository: UserRepository,
+  private val userRepository: UserRepository,
 ) : UserService {
 
   override fun isDuplicatedUserId(id: String): Boolean {
-    return userRepository.findByUserId(id)?.let { false } ?: let { true }
+    return userRepository.findByUserId(id)?.let { false } ?: true
   }
 
   override fun validatePassword(password: String): Boolean {
+    var passedCount = 0
     //비밀번호는 최소 9자 이상 15자 이하
-    if (9 >= password.length && 15 < password.length) {
-      return false
-    }
+    if (9 <= password.length && 15 > password.length) passedCount++
 
     //비밀번호 대문자 1글자 이상
-    if (!isCheckAlphabetUpperCase(password)) {
-      return false
-    }
+    if (isCheckAlphabetUpperCase(password)) passedCount++
 
-    if (!(password.contains('!') || password.contains('@') || password.contains('#'))) {
-      return false
-    }
-    //숫자를 포함
-    return true
+    if (password.contains('!') || password.contains('@') || password.contains('#')) passedCount++
+
+    if(assertPasswordStrength(passedCount) == PasswordStrength.STRONG) return true
+    else return false
   }
 
   private fun isCheckAlphabetUpperCase(password: String): Boolean {
@@ -43,11 +39,11 @@ class UserServiceImpl @Autowired constructor(
     return isAlphaUpperCase
   }
 
-  override fun assertPasswordStrength(passwordStrength: PasswordStrength): Boolean {
-    if(PasswordStrength.STRONG == passwordStrength) {
-      return true
-    }
-    return false
+  override fun assertPasswordStrength(passedCount: Int): PasswordStrength {
+    if(passedCount == 1) return PasswordStrength.WEEK
+    else if (passedCount == 2) return PasswordStrength.NORMAL
+    else if(passedCount == 3) return PasswordStrength.STRONG
+    else return PasswordStrength.WEEK
   }
 
   override fun createUser(user: User): User {

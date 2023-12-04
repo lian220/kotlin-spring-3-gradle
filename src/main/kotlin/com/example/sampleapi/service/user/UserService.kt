@@ -6,6 +6,6 @@ import com.example.sampleapi.dto.user.PasswordStrength
 interface UserService {
   fun isDuplicatedUserId(id: String): Boolean
   fun validatePassword(password: String): Boolean
-  fun assertPasswordStrength(passwordStrength: PasswordStrength): Boolean
+  fun assertPasswordStrength(passedCount: Int): PasswordStrength
   fun createUser(user: User): User
 }
